@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I. Contexte &amp; enjeux — Mohamed</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --paper:#F2F5F4; --ink:#101A1C; --ink-soft:#4B5A5D; --ink-faint:#7C8B8D;
+    --line:#D3DBDA; --surface:#FFFFFF; --surface-2:#E7ECEB;
+    --accent:#146F6F; /* teal — partie Mohaned / contexte */
+    --shadow: 0 1px 2px rgba(16,26,28,.06), 0 8px 24px rgba(16,26,28,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0C1315; --ink:#E8EDEC; --ink-soft:#A7B4B3; --ink-faint:#78878A;
+      --line:#243030; --surface:#12191B; --surface-2:#182022; --accent:#43B9B4;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0C1315; --ink:#E8EDEC; --ink-soft:#A7B4B3; --ink-faint:#78878A;
+    --line:#243030; --surface:#12191B; --surface-2:#182022; --accent:#43B9B4;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.6;}
+  .num{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+  h1,h2,h3{font-family:'Big Shoulders Display','Arial Narrow',sans-serif; text-wrap:balance; margin:0;}
+
+  header.hero{padding:72px 8vw 56px; max-width:1100px;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:18px; display:flex; align-items:center; gap:9px;}
+  .kicker .dot{width:9px;height:9px;border-radius:2px;background:var(--accent);}
+  header.hero h1{font-size:clamp(34px,5vw,58px); font-weight:900; line-height:1.03; margin-bottom:18px; max-width:16ch;}
+  header.hero .sub{font-size:17px; color:var(--ink-soft); max-width:62ch;}
+  header.hero .meta{margin-top:22px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-faint);}
+
+  main{max-width:1100px; margin:0 auto; padding:0 8vw 90px;}
+  section.block{padding:44px 0; border-top:1px solid var(--line);}
+  section.block h2{font-size:clamp(24px,2.6vw,32px); font-weight:800; margin-bottom:18px; color:var(--ink);}
+  .step-tag{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px;}
+  p{font-size:15.5px; color:var(--ink); max-width:70ch; margin:0 0 14px;}
+  p:last-child{margin-bottom:0;}
+  b{font-weight:600;}
+
+  .stat-row{display:flex; gap:24px; flex-wrap:wrap; margin:26px 0 6px;}
+  .stat-tile{flex:1; min-width:200px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow);}
+  .stat-tile .v{font-family:'Big Shoulders Display'; font-weight:800; font-size:34px; color:var(--accent); line-height:1;}
+  .stat-tile .u{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em; margin-top:6px;}
+
+  figure{margin:28px 0 6px;}
+  figure img{width:100%; height:auto; border-radius:10px; border:1px solid var(--line); box-shadow:var(--shadow); display:block;}
+  figcaption{font-size:12.5px; color:var(--ink-faint); margin-top:10px; font-family:'IBM Plex Mono',monospace;}
+
+  ul.hier{list-style:none; margin:16px 0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  ul.hier li{padding:12px 16px; background:var(--surface); border:1px solid var(--line); border-radius:8px; font-size:14.5px; box-shadow:var(--shadow);}
+  ul.hier li b{color:var(--accent);}
+
+  ol.chain{counter-reset:step; list-style:none; margin:16px 0; padding:0; display:flex; gap:10px; flex-wrap:wrap;}
+  ol.chain li{counter-increment:step; font-family:'IBM Plex Mono',monospace; font-size:12.5px; padding:7px 14px; border:1px solid var(--line); border-radius:999px; color:var(--ink-soft); background:var(--surface-2);}
+  ol.chain li:first-child{color:var(--accent); border-color:var(--accent); font-weight:600;}
+
+  table.tbl{border-collapse:collapse; width:100%; margin:18px 0; font-size:14px;}
+  table.tbl th, table.tbl td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+  table.tbl th{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-faint); font-weight:500;}
+  table.tbl td.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
+
+  .callout{margin-top:34px; padding:22px 26px; border-left:3px solid var(--accent); background:var(--surface); border-radius:0 10px 10px 0; box-shadow:var(--shadow);}
+  .callout p{font-size:16px; margin:0;}
+
+  .handoff{margin-top:20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--accent);}
+
+  footer{padding:34px 8vw 60px; font-size:12.5px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="kicker"><span class="dot"></span>I · Contexte &amp; enjeux — Mohamed</div>
+  <h1>L'angle mort du calcul carbone des data centers</h1>
+  <p class="sub">Les data centers pèsent de plus en plus lourd sur le climat — mais la manière dont on mesure ce poids reste largement approximative. C'est le point de départ de l'étude.</p>
+  <div class="meta">Smith, M., Mann, M. &amp; Lal, P. (2026). Sustainability, 18(11), 5671 — durée cible 5–6 min</div>
+</header>
+
+<main>
+
+  <section class="block">
+    <div class="step-tag">01 — Pourquoi ce sujet compte</div>
+    <h2>Une croissance énergétique qui ne ralentit pas</h2>
+    <p>L'IEA estimait à <b>330 millions de tonnes de CO₂ eq</b> les émissions des data centers en 2020 — 0,6 % des émissions mondiales de gaz à effet de serre. En 2021, data centers et réseaux de transmission représentaient déjà <b>1 à 1,3 %</b> de la consommation électrique mondiale.</p>
+    <p>Entre 2015 et 2023, la charge de travail a fait grimper leur consommation énergétique de 20 à 40 %. L'IEA projette qu'en 2026, la consommation électrique liée aux data centers, à l'IA et aux cryptomonnaies atteindra <b>620 à 1050 TWh</b> — jusqu'à 590 TWh de plus qu'en 2022.</p>
+    <div class="stat-row">
+      <div class="stat-tile"><div class="v">330</div><div class="u">Mt CO₂ eq · 2020</div></div>
+      <div class="stat-tile"><div class="v">1–1,3 %</div><div class="u">Électricité mondiale · 2021</div></div>
+      <div class="stat-tile"><div class="v">620–1050</div><div class="u">TWh projetés · 2026</div></div>
+    </div>
+    <figure>
+      <img src="graphiques/01_contexte_fig1_chiffres_cles.png" alt="Trois chiffres clés : 330 Mt CO2 eq en 2020, 1 à 1,3% de l'électricité mondiale en 2021, 620 à 1050 TWh projetés en 2026">
+      <figcaption>Figure 1 — Trois chiffres qui cadrent l'enjeu (source : IEA, 2024)</figcaption>
+    </figure>
+  </section>
+
+  <section class="block">
+    <div class="step-tag">02 — Comment le carbone est censé être mesuré</div>
+    <h2>Le GHG Protocol classe — mais ne mesure pas tout</h2>
+    <p>L'UE a introduit en 2024 une obligation de reporting énergie/émissions pour les data centers (Energy Efficiency Directive), avec un objectif de neutralité climatique en 2030. Le cadre de référence du secteur reste le <b>GHG Protocol</b>, structuré en trois périmètres :</p>
+    <ul class="hier">
+      <li><b>Scope 1</b> — émissions directes (combustibles, groupes électrogènes)</li>
+      <li><b>Scope 2</b> — électricité, chauffage, refroidissement achetés</li>
+      <li><b>Scope 3</b> — toute la chaîne de valeur : achats, biens d'équipement, transport, fin de vie</li>
+    </ul>
+    <p>Pour les achats et biens d'équipement (le plus pertinent pour l'IT), quatre méthodes existent, de la plus précise à la plus grossière :</p>
+    <ol class="chain">
+      <li>Supplier-specific</li><li>Hybride</li><li>Average-data</li><li>Spend-based</li>
+    </ol>
+    <p style="margin-top:8px; font-size:14px; color:var(--ink-soft);">Plus on descend dans cette hiérarchie, moins la mesure reflète la réalité physique du matériel.</p>
+  </section>
+
+  <section class="block">
+    <div class="step-tag">03 — Deux angles morts des standards actuels</div>
+    <h2>Le Scope 3 échappe au contrôle, le carbone masque le reste</h2>
+    <p><b>Premier angle mort.</b> La majorité des fabricants ne fournissent pas de données d'émissions spécifiques à leurs produits. Les modèles d'affaires du secteur sont en plus très hétérogènes — colocation (Equinix, CyrusOne) vs cloud intégré (AWS, Azure) — ce qui explique d'énormes écarts de transparence dans les déclarations CDP 2023.</p>
+    <figure>
+      <img src="graphiques/01_contexte_fig2_scope3_cdp.png" alt="Bar chart : part du Scope 3 dans les émissions totales déclarées au CDP 2023 — CyrusOne 19%, Equinix 35%, NTT Data 91%">
+      <figcaption>Figure 2 — Part du Scope 3 dans les émissions totales déclarées au CDP (2023)</figcaption>
+    </figure>
+    <p style="margin-top:22px;"><b>Second angle mort.</b> En se concentrant sur le CO₂, les standards GHG ignorent d'autres impacts majeurs de la fabrication IT — toxicité, eau, épuisement de ressources minérales — qui peuvent être disproportionnés par rapport au poids carbone d'un composant.</p>
+    <table class="tbl">
+      <thead><tr><th>Constat</th><th>Conséquence</th></tr></thead>
+      <tbody>
+        <tr><td>Peu de données produit fournisseur</td><td>Recours forcé aux méthodes moyennées (average-data, spend-based)</td></tr>
+        <tr><td>18 % seulement des entreprises rapportent leur Scope 3</td><td>Empreinte réelle des data centers largement sous-estimée</td></tr>
+        <tr><td>Reporting centré sur le CO₂</td><td>Toxicité, eau, ressources minérales hors radar</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="block">
+    <div class="step-tag">04 — La question de recherche</div>
+    <h2>L'hypothèse centrale de l'étude</h2>
+    <div class="callout">
+      <p>L'analyse de cycle de vie <b>(ACV / LCA)</b> peut-elle mesurer les émissions carbone avec plus de justesse que les méthodes comptables classiques — et révéler, au passage, des impacts environnementaux que le CO₂ seul ne montre jamais ?</p>
+    </div>
+    <p style="margin-top:22px;">Pour y répondre, l'étude va comparer un modèle ACV empirique aux méthodes <b>average-data</b> et <b>spend-based</b> du GHG Protocol, tester sa robustesse (sensibilité, incertitude), puis explorer des scénarios de décarbonation.</p>
+    <div class="handoff">→ Merouan enchaîne sur la méthodologie de l'étude</div>
+  </section>
+
+</main>
+
+<footer>Smith, M., Mann, M. &amp; Lal, P. (2026). Carbon Accounting and Beyond. Sustainability, 18(11), 5671 · doi.org/10.3390/su18115671 — Partie rédigée par Mohamed</footer>
+
+</body>
+</html>
