@@ -223,7 +223,7 @@ Le carbone est maintenant localisé : deux tiers dans l'électricité consommée
 
 ---
 
-## Annexe — Visuels et sources
+## Annexe - Visuels et sources
 
 | Visuel | Fichier | Source |
 |---|---|---|
