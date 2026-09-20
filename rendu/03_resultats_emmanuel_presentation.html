@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>III. Résultats chiffrés — Emmanuel</title>
+<style>
+  :root {
+    --teal: #2F7F99;
+    --teal-d: #1D5A6F;
+    --teal-l: #E6F2F5;
+    --teal-m: #7FBFC9;
+    --orange: #E07B39;
+    --orange-l: #FBEEE4;
+    --ink: #17303A;
+    --muted: #5F6E77;
+    --line: #D3DEE3;
+    --bg: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #0E1E25; overflow: hidden; font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; color: var(--ink); }
+
+  /* ----- Scène fixe 1920x1080, mise à l'échelle par JS ----- */
+  #stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center center; background: var(--bg); overflow: hidden; }
+  .slide { position: absolute; inset: 0; padding: 84px 120px 90px; opacity: 0; visibility: hidden; transition: opacity .35s ease; display: flex; flex-direction: column; }
+  .slide.active { opacity: 1; visibility: visible; }
+
+  .tag { font-size: 24px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); margin-bottom: 16px; }
+  h1.title { font-size: 68px; line-height: 1.08; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+  .lead { font-size: 34px; line-height: 1.4; color: var(--muted); margin-top: 18px; max-width: 1500px; }
+  .source { position: absolute; left: 120px; bottom: 34px; font-size: 20px; color: var(--muted); }
+  .pageno { position: absolute; right: 120px; bottom: 34px; font-size: 22px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .dag { color: var(--orange); font-weight: 700; }
+  sub, sup { line-height: 0; }
+
+  /* ----- Diapo titre ----- */
+  .slide.cover { background: linear-gradient(135deg, #1D5A6F 0%, #2F7F99 60%, #3E93AE 100%); color: #fff; justify-content: center; }
+  .cover .tag { color: #BFE3EA; font-size: 28px; }
+  .cover h1.title { color: #fff; font-size: 128px; letter-spacing: -.02em; }
+  .cover .question { font-size: 46px; line-height: 1.3; font-weight: 300; margin-top: 44px; max-width: 1450px; color: #EAF6F9; }
+  .cover .question b { font-weight: 700; color: #fff; }
+  .cover .meta { position: absolute; left: 120px; bottom: 70px; font-size: 26px; color: #CDE9EF; line-height: 1.5; }
+  .cover .badge { position: absolute; right: 120px; bottom: 70px; font-size: 26px; padding: 14px 28px; border: 2px solid rgba(255,255,255,.5); border-radius: 999px; color: #fff; }
+
+  /* ----- Diapo 2 : chiffre central ----- */
+  .hero { display: flex; align-items: center; gap: 90px; margin-top: 30px; flex: 1; }
+  .hero-num { font-size: 260px; font-weight: 800; line-height: 1; color: var(--teal); letter-spacing: -.03em; }
+  .hero-unit { font-size: 40px; color: var(--muted); margin-top: 8px; line-height: 1.3; }
+  .stack { width: 100%; }
+  .stackbar { display: flex; height: 140px; border-radius: 14px; overflow: hidden; }
+  .seg { display: flex; align-items: center; justify-content: center; font-size: 46px; font-weight: 800; color: #fff; width: 0; transition: width 1.1s cubic-bezier(.2,.7,.2,1) .25s; white-space: nowrap; overflow: hidden; }
+  .active .seg { width: var(--w); }
+  .seg.a { background: var(--teal); }
+  .seg.b { background: var(--teal-m); color: var(--ink); }
+  .legend2 { display: flex; margin-top: 22px; gap: 28px; }
+  .legend2 > div { flex: 1; font-size: 30px; line-height: 1.35; }
+  .legend2 b { display: block; font-size: 34px; }
+  .dot { display: inline-block; width: 22px; height: 22px; border-radius: 6px; margin-right: 12px; vertical-align: -2px; }
+  .callout { margin-top: 30px; padding: 26px 34px; background: var(--teal-l); border-left: 8px solid var(--teal); border-radius: 8px; font-size: 32px; line-height: 1.4; }
+
+  /* ----- Barres horizontales génériques ----- */
+  .hbars { margin-top: 44px; display: flex; flex-direction: column; gap: 40px; }
+  .hrow { display: grid; grid-template-columns: 340px 1fr; align-items: center; column-gap: 28px; }
+  .hlabel { font-size: 32px; font-weight: 600; text-align: right; }
+  .htrack { position: relative; height: 84px; }
+  .hbar { height: 100%; border-radius: 0 10px 10px 0; background: #9AA9B1; width: 0; transition: width 1s cubic-bezier(.2,.7,.2,1) .2s; min-width: 4px; }
+  .active .hbar { width: var(--w); }
+  .hbar.hi { background: var(--orange); }
+  .hbar.el { background: var(--teal); }
+  .hval { position: absolute; left: calc(var(--w) + 22px); top: 50%; transform: translateY(-50%); font-size: 30px; white-space: nowrap; opacity: 0; transition: opacity .6s ease 1s; }
+  .active .hval { opacity: 1; }
+  .hval b { font-weight: 800; }
+
+  .split { display: flex; gap: 70px; flex: 1; margin-top: 10px; }
+  .split .left { flex: 1.55; }
+  .split .right { flex: 1; display: flex; flex-direction: column; gap: 28px; justify-content: center; }
+
+  .stat { padding: 30px 36px; border-radius: 16px; background: var(--teal-l); }
+  .stat.o { background: var(--orange-l); }
+  .stat .big { font-size: 96px; font-weight: 800; line-height: 1; color: var(--teal); letter-spacing: -.02em; }
+  .stat.o .big { color: var(--orange); }
+  .stat .txt { font-size: 30px; line-height: 1.35; margin-top: 12px; }
+  .stat .small { font-size: 24px; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+
+  /* ----- Diapo 4 : deux cartes ----- */
+  .cards { display: flex; gap: 46px; margin-top: 34px; flex: 1; }
+  .card { flex: 1; border-radius: 20px; padding: 44px 48px; background: var(--teal-l); display: flex; flex-direction: column; }
+  .card.o { background: var(--orange-l); }
+  .card .big { font-size: 150px; font-weight: 800; line-height: 1; color: var(--teal); letter-spacing: -.03em; }
+  .card.o .big { color: var(--orange); }
+  .card h3 { font-size: 40px; margin: 14px 0 18px; }
+  .card p { font-size: 31px; line-height: 1.4; }
+  .card .eq { margin-top: auto; padding-top: 22px; font-size: 26px; color: var(--muted); line-height: 1.4; }
+
+  /* ----- Diapo 5 : colonnes empilées ----- */
+  .vchart { display: flex; align-items: flex-end; justify-content: space-around; height: 520px; padding: 0 40px; border-bottom: 3px solid var(--ink); position: relative; }
+  .vcol { width: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; }
+  .vstack { width: 100%; display: flex; flex-direction: column-reverse; }
+  .vseg { width: 100%; height: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; transition: height 1.1s cubic-bezier(.2,.7,.2,1) .25s; overflow: hidden; }
+  .active .vseg { height: var(--h); }
+  .vseg.el { background: var(--teal); color: #fff; }
+  .vseg.eq { background: var(--teal-m); color: var(--ink); }
+  .vseg.sb { background: var(--orange); color: #fff; }
+  .vtotal { font-size: 50px; font-weight: 800; margin-bottom: 8px; }
+  .vdelta { font-size: 30px; font-weight: 800; margin-bottom: 2px; }
+  .vname { position: absolute; bottom: -62px; width: 100%; text-align: center; font-size: 32px; font-weight: 700; }
+  .vwrap { flex: 1.35; padding-bottom: 70px; }
+  .vlegend { display: flex; flex-wrap: nowrap; gap: 26px; margin-bottom: 26px; font-size: 24px; white-space: nowrap; }
+
+  /* ----- Diapo 6 : barres appariées ----- */
+  .pairs { margin-top: 26px; display: flex; flex-direction: column; gap: 22px; }
+  .prow { display: grid; grid-template-columns: 300px 1fr 150px; align-items: center; column-gap: 24px; }
+  .prow .nm { font-size: 32px; font-weight: 700; text-align: right; }
+  .pbars { display: flex; flex-direction: column; gap: 8px; }
+  .ptrack { position: relative; height: 40px; }
+  .pbar { height: 100%; width: 0; min-width: 4px; border-radius: 0 8px 8px 0; transition: width 1s cubic-bezier(.2,.7,.2,1) .2s; }
+  .active .pbar { width: var(--w); }
+  .pbar.a { background: var(--teal); }
+  .pbar.s { background: var(--orange); }
+  .pv { position: absolute; left: calc(var(--w) + 14px); top: 50%; transform: translateY(-50%); font-size: 24px; white-space: nowrap; }
+  .ratio { font-size: 52px; font-weight: 800; text-align: center; }
+  .ratio.up { color: var(--orange); }
+  .ratio.down { color: var(--teal); }
+  .plegend { display: flex; gap: 34px; font-size: 26px; margin-top: 8px; }
+
+  /* ----- Diapo 7 : robustesse ----- */
+  table.t { border-collapse: collapse; width: 100%; font-size: 27px; }
+  table.t th { text-align: left; font-size: 21px; white-space: nowrap; color: var(--muted); font-weight: 600; padding: 12px 18px; border-bottom: 3px solid var(--ink); }
+  table.t td { padding: 20px 14px; white-space: nowrap; border-bottom: 1px solid var(--line); }
+  table.t tr.ref td { background: var(--teal-l); font-weight: 800; }
+  .gauge { margin-top: 14px; }
+  .gtrack { position: relative; height: 56px; background: linear-gradient(90deg, #CFE8DA 0 26.9%, #F6E1CF 26.9% 100%); border-radius: 10px; }
+  .gmark { position: absolute; top: -14px; height: 84px; width: 8px; background: var(--ink); border-radius: 4px; left: 0; transition: left 1.2s cubic-bezier(.2,.7,.2,1) .3s; }
+  .active .gmark { left: var(--x); }
+  .gscale { position: relative; height: 44px; margin-bottom: 8px; font-size: 24px; color: var(--muted); }
+  .gscale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+
+  /* ----- Diapo 8 : impacts hors CO2 ----- */
+  .impacts { display: flex; gap: 40px; margin-top: 34px; }
+  .imp { flex: 1; border-radius: 18px; padding: 36px 38px; background: var(--teal-l); }
+  .imp .k { font-size: 26px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal-d); }
+  .imp .v { font-size: 74px; font-weight: 800; line-height: 1.05; margin: 14px 0 6px; color: var(--teal); letter-spacing: -.02em; }
+  .imp .u { font-size: 26px; color: var(--muted); }
+  .imp .p { margin-top: 20px; font-size: 27px; line-height: 1.4; }
+  .hot { margin-top: 34px; padding: 30px 40px; border-radius: 16px; background: var(--orange-l); border-left: 10px solid var(--orange); font-size: 32px; line-height: 1.45; }
+  .hot b { color: var(--orange); }
+
+  /* ----- Diapo 9 : à retenir ----- */
+  .points { margin-top: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .pt { display: flex; align-items: center; gap: 28px; padding: 14px 30px; border-radius: 14px; background: var(--teal-l); font-size: 30px; line-height: 1.28; }
+  .pt .n { flex: 0 0 56px; height: 56px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 34px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .next { position: absolute; left: 120px; right: 120px; bottom: 80px; padding: 22px 40px; border-radius: 14px; background: var(--teal-d); color: #fff; font-size: 32px; line-height: 1.35; }
+  .next b { color: #FFD9BF; }
+
+  /* ----- Interface hors scène ----- */
+  #progress { position: fixed; left: 0; top: 0; height: 6px; background: var(--orange); width: 0; transition: width .3s ease; z-index: 20; }
+  #hint { position: fixed; right: 16px; top: 12px; font-size: 13px; color: #9FB5BE; z-index: 20; opacity: .85; font-family: system-ui, sans-serif; }
+  #notes { position: fixed; left: 0; right: 0; bottom: 0; max-height: 46vh; overflow: auto; background: rgba(9, 22, 28, .96); color: #E8F1F4; padding: 18px 40px 26px; font-size: 20px; line-height: 1.55; z-index: 30; display: none; font-family: "Segoe UI", system-ui, sans-serif; border-top: 3px solid var(--orange); }
+  #notes.on { display: block; }
+  #notes .hd { display: flex; justify-content: space-between; color: #FFB98A; font-weight: 700; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+  #notes p { margin-bottom: 10px; max-width: 1400px; }
+  #nav button { position: fixed; top: 50%; transform: translateY(-50%); z-index: 15; width: 56px; height: 96px; border: 0; background: rgba(255,255,255,.0); color: transparent; cursor: pointer; font-size: 40px; }
+  #nav button:hover { background: rgba(0,0,0,.08); color: #fff; }
+  #nav .prev { left: 0; } #nav .next-b { right: 0; }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="stage">
+
+  <!-- 1. Titre -->
+  <section class="slide cover" data-notes="
+    <p>Bonjour à tous. Après le contexte présenté par Mohamed et la méthodologie de Merouan, je vous présente les résultats chiffrés de l'étude.</p>
+    <p>Le fil rouge de ma partie tient en une question : sur un même data center, trois méthodes de calcul donnent trois bilans carbone différents. Laquelle croire, et où se cache vraiment le carbone ?</p>">
+    <div class="tag">Partie III</div>
+    <h1 class="title">Résultats chiffrés</h1>
+    <p class="question">Un même data center, <b>trois méthodes de calcul</b>, trois bilans carbone.<br>Lequel croire, et <b>où se cache vraiment le carbone</b> ?</p>
+    <div class="meta">Emmanuel<br>Smith, Mann &amp; Lal (2026), <i>Sustainability</i>, 18(11), 5671</div>
+    <div class="badge">6–7 min</div>
+  </section>
+
+  <!-- 2. Chiffre central -->
+  <section class="slide" data-notes="
+    <p>Je commence par le chiffre central. Pour chaque kilowattheure consommé par les équipements informatiques du data center, l'analyse de cycle de vie donne <b>0,710 kilogramme de CO₂ équivalent</b>. Pour l'ordre de grandeur, d'après nos calculs, un site qui consomme un gigawattheure émet environ 710 tonnes.</p>
+    <p>Ce total se décompose en deux blocs. <b>67,3 % viennent de l'électricité consommée</b>, soit 0,478 kilogramme. Les <b>32,7 % restants</b>, soit 0,232 kilogramme, viennent de la fabrication des équipements : extraction des métaux, fabrication des puces, assemblage. C'est le Scope 3 dont Mohamed a parlé, le plus difficile à mesurer.</p>
+    <p>À retenir : deux tiers pour l'usage, un tiers déjà incorporé dans le matériel avant même qu'il soit branché.</p>">
+    <div class="tag">Le bilan de référence</div>
+    <h1 class="title">Le chiffre central de l'étude</h1>
+    <div class="hero">
+      <div>
+        <div class="hero-num">0,710</div>
+        <div class="hero-unit">kg CO<sub>2</sub> eq<br>par kWh consommé</div>
+      </div>
+      <div class="stack">
+        <div class="stackbar">
+          <div class="seg a" style="--w:67.3%">67,3 %</div>
+          <div class="seg b" style="--w:32.7%">32,7 %</div>
+        </div>
+        <div class="legend2">
+          <div style="flex:67.3"><b><span class="dot" style="background:var(--teal)"></span>Électricité consommée</b>0,478 kg · phase d'usage</div>
+          <div style="flex:32.7"><b><span class="dot" style="background:var(--teal-m)"></span>Fabrication</b>0,232 kg<span class="dag">†</span></div>
+        </div>
+        <div class="callout">Deux tiers pour l'usage, <b>un tiers déjà incorporé dans le matériel</b> avant même qu'il soit branché (Scope 3).<br>Ordre de grandeur : ≈ <b>710 tonnes de CO<sub>2</sub> eq par GWh</b> consommé<span class="dag">†</span></div>
+      </div>
+    </div>
+    <div class="source"><span class="dag">†</span> calcul à partir des valeurs de l'article · Source : Smith, Mann &amp; Lal (2026), §3.1, Table 5</div>
+    <div class="pageno"></div>
+  </section>
+
+  <!-- 3. Où se cache le carbone -->
+  <section class="slide" data-notes="
+    <p>Regardons où se cache ce carbone. Après l'électricité, un poste ressort nettement : <b>les serveurs standard</b>, avec 20,9 % du bilan total, soit 0,149 kilogramme par kWh. C'est plus que le réseau, le stockage et tous les autres équipements réunis, qui font environ 0,08 kilogramme.</p>
+    <p>Les auteurs l'expliquent par le circuit intégré : sa fabrication demande beaucoup d'électricité et d'eau, ainsi que des métaux précieux comme l'or.</p>">
+    <div class="tag">Contribution au bilan ACV</div>
+    <h1 class="title">Où se cache le carbone ?</h1>
+    <div class="split">
+      <div class="left">
+        <div class="hbars">
+          <div class="hrow"><div class="hlabel">Électricité</div><div class="htrack"><div class="hbar el" style="--w:100%"></div><div class="hval" style="--w:100%;left:auto;right:24px;color:#fff"><b>0,478</b> · 67,3 %</div></div></div>
+          <div class="hrow"><div class="hlabel">Serveurs standard</div><div class="htrack"><div class="hbar hi" style="--w:31.2%"></div><div class="hval" style="--w:31.2%"><b>0,149</b> · 20,9 %</div></div></div>
+          <div class="hrow"><div class="hlabel">Réseau (standard)</div><div class="htrack"><div class="hbar" style="--w:7.3%"></div><div class="hval" style="--w:7.3%">0,035 · 4,9 %<span class="dag">†</span></div></div></div>
+          <div class="hrow"><div class="hlabel">Stockage</div><div class="htrack"><div class="hbar" style="--w:5.8%"></div><div class="hval" style="--w:5.8%">0,028 · 3,9 %<span class="dag">†</span></div></div></div>
+          <div class="hrow"><div class="hlabel">Autres équipements</div><div class="htrack"><div class="hbar" style="--w:4.1%"></div><div class="hval" style="--w:4.1%">0,020 · 2,8 %<span class="dag">†</span></div></div></div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="stat o"><div class="big">20,9 %</div><div class="txt">du bilan total pour <b>les seuls serveurs standard</b></div><div class="small">Plus que réseau, stockage et autres équipements réunis (≈ 0,08 kg<span class="dag">†</span>)</div></div>
+        <div class="stat"><div class="txt"><b>Pourquoi ?</b> Le circuit intégré : beaucoup d'électricité et d'eau à la fabrication, plus des métaux précieux comme l'or.</div></div>
+      </div>
+    </div>
+    <div class="source">kg CO<sub>2</sub> eq par kWh · <span class="dag">†</span> calcul à partir des valeurs de l'article · Source : Smith, Mann &amp; Lal (2026), §3.1, Table 5 · « Autres » = blade, réseau modulaire, écran, châssis, KVM, clavier</div>
+  </section>
+
+  <!-- 4. Serveur standard G2 et blade -->
+  <section class="slide" data-notes="
+    <p>Au niveau de chaque génération de matériel, un seul type de machine domine : <b>le serveur standard de génération 2</b>. Sa consommation électrique représente 16,7 % du bilan et sa fabrication 12,6 %. À lui seul, il pèse près de 30 % du total, d'après nos calculs. C'est aussi la génération la plus nombreuse, avec 60 % du parc.</p>
+    <p>Dernier chiffre : un <b>serveur blade émet 0,00921 kilogramme contre 0,149 pour un serveur standard</b>, soit 93,8 % de moins, environ seize fois moins. Attention : les auteurs précisent que ces deux types de serveurs ne rendent pas exactement le même service. C'est un signal fort, pas une équivalence.</p>
+    <p>Le message : c'est sur les serveurs qu'il faut concentrer les efforts.</p>">
+    <div class="tag">Zoom sur le point chaud</div>
+    <h1 class="title">Un seul type de machine domine</h1>
+    <div class="cards">
+      <div class="card o">
+        <div class="big">≈ 30 %</div>
+        <h3>du bilan pour le serveur standard de génération 2</h3>
+        <p>16,7 % par sa consommation électrique<br>+ 12,6 % par sa fabrication</p>
+        <div class="eq">Génération 2 = 60 % du parc d'équipements. <span class="dag">†</span> somme 16,7 + 12,6</div>
+      </div>
+      <div class="card">
+        <div class="big">−93,8 %</div>
+        <h3>pour un serveur blade par rapport à un serveur standard</h3>
+        <p>0,00921 kg contre 0,149 kg par kWh, soit environ <b>16 fois moins</b><span class="dag">†</span></p>
+        <div class="eq">Prudence : les deux serveurs ne rendent pas exactement le même service. Les auteurs demandent des comparaisons normalisées par la performance.</div>
+      </div>
+    </div>
+    <div class="source">Source : Smith, Mann &amp; Lal (2026), §3.1, Figure 2 et Table 5</div>
+  </section>
+
+  <!-- 5. Trois méthodes -->
+  <section class="slide" data-notes="
+    <p>Voici le résultat le plus parlant de l'étude. Les auteurs ont calculé le bilan du même data center avec <b>trois méthodes</b>.</p>
+    <p>L'ACV, notre référence : <b>0,710</b>. L'<i>average-data</i>, qui multiplie la masse du matériel par un facteur d'émission moyen : <b>0,723</b>, soit seulement 1,8 % de plus. Regardez : sur les équipements, les deux méthodes donnent exactement le même résultat, 0,232. La petite différence vient de l'électricité, car l'average-data ne distingue pas les trois générations de matériel.</p>
+    <p>Le <i>spend-based</i>, qui multiplie le prix d'achat par un facteur d'émission par dollar : <b>1,07</b>. C'est un écart de <b>40,4 %</b> selon la formule des auteurs, ou, en rapport simple, <b>1,5 fois</b> le résultat de l'ACV. Sur un gigawattheure, cela fait environ 360 tonnes de CO₂ en plus sur le papier, qui n'existent pas.</p>
+    <p>Et tout l'écart se joue sur les équipements : <b>0,58 kilogramme contre 0,23</b>, soit deux fois et demie plus.</p>
+    <p><i>Si on vous demande pourquoi 40,4 % et pas 51 % :</i> les auteurs divisent l'écart par la moyenne des deux valeurs. Le rapport simple 1,07 / 0,710 donne ×1,5, soit +51 %. Les deux sont corrects.</p>">
+    <div class="tag">Le cœur des résultats</div>
+    <h1 class="title">Même data center, trois méthodes, trois bilans</h1>
+    <div class="split">
+      <div class="left vwrap">
+        <div class="vlegend">
+          <span><span class="dot" style="background:var(--teal)"></span>Électricité</span>
+          <span><span class="dot" style="background:var(--teal-m)"></span>Équipements</span>
+          <span><span class="dot" style="background:var(--orange)"></span>Équipements (spend-based)</span>
+        </div>
+        <div class="vchart">
+          <div class="vcol">
+            <div class="vtotal">0,710</div>
+            <div class="vstack"><div class="vseg el" style="--h:182px">0,478</div><div class="vseg eq" style="--h:88px">0,232</div></div>
+            <div class="vname">ACV</div>
+          </div>
+          <div class="vcol">
+            <div class="vdelta" style="color:var(--teal)">+1,8 %</div>
+            <div class="vtotal">0,723</div>
+            <div class="vstack"><div class="vseg el" style="--h:187px">0,491</div><div class="vseg eq" style="--h:88px">0,232</div></div>
+            <div class="vname">Average-data</div>
+          </div>
+          <div class="vcol">
+            <div class="vdelta" style="color:var(--orange)">+40,4 % (×1,5)</div>
+            <div class="vtotal">1,07</div>
+            <div class="vstack"><div class="vseg el" style="--h:187px">0,491</div><div class="vseg sb" style="--h:221px">0,582</div></div>
+            <div class="vname">Spend-based</div>
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="stat"><div class="txt"><b>Average-data :</b> mêmes équipements que l'ACV (0,232). Seule l'électricité diffère, faute de distinguer les générations.</div></div>
+        <div class="stat o"><div class="big">×2,5</div><div class="txt"><b>Spend-based :</b> 0,58 kg contre 0,23 kg pour les équipements seuls<span class="dag">†</span>. Sur 1 GWh : ≈ 360 t de CO<sub>2</sub> en plus<span class="dag">†</span>.</div></div>
+      </div>
+    </div>
+    <div class="source">kg CO<sub>2</sub> eq par kWh · écarts en % calculés par les auteurs (différence relative moyenne) ; ×1,5 = 1,07 / 0,710 · <span class="dag">†</span> calcul à partir de la Table 5</div>
+  </section>
+
+  <!-- 6. Spend-based se trompe -->
+  <section class="slide" data-notes="
+    <p>Le spend-based ne se contente pas de gonfler le total : <b>il se trompe dans les deux sens</b>. Il multiplie par 108 le carbone du châssis, par 8 celui du stockage et par 6,5 celui du réseau. Mais il <b>divise par 5,6 celui du serveur standard</b>, c'est-à-dire le véritable point chaud.</p>
+    <p>La raison : le prix n'est pas le carbone. Le prix d'un serveur inclut la main-d'œuvre, le transport, la marge du fournisseur et les fluctuations du marché. De plus, le facteur d'émission est associé à la composition matérielle d'un type d'équipement, non à l'équipement lui-même.</p>
+    <p>Un responsable qui s'appuierait sur cette méthode agirait donc sur les mauvais équipements. Les auteurs recommandent d'éviter le spend-based pour les décisions importantes, sauf si aucune autre donnée n'est disponible.</p>">
+    <div class="tag">Ce que cache le total</div>
+    <h1 class="title">Le spend-based se trompe dans les deux sens</h1>
+    <div class="plegend"><span><span class="dot" style="background:var(--teal)"></span>ACV (référence)</span><span><span class="dot" style="background:var(--orange)"></span>Spend-based</span></div>
+    <div class="pairs">
+      <div class="prow"><div class="nm">Châssis</div><div class="pbars">
+        <div class="ptrack"><div class="pbar a" style="--w:.4%"></div><div class="pv" style="--w:.4%">0,00076</div></div>
+        <div class="ptrack"><div class="pbar s" style="--w:36.1%"></div><div class="pv" style="--w:36.1%">0,082</div></div></div>
+        <div class="ratio up">×108</div></div>
+      <div class="prow"><div class="nm">Réseau (standard)</div><div class="pbars">
+        <div class="ptrack"><div class="pbar a" style="--w:15.4%"></div><div class="pv" style="--w:15.4%">0,035</div></div>
+        <div class="ptrack"><div class="pbar s" style="--w:100%"></div><div class="pv" style="--w:100%;left:auto;right:14px;color:#fff">0,227</div></div></div>
+        <div class="ratio up">×6,5</div></div>
+      <div class="prow"><div class="nm">Stockage</div><div class="pbars">
+        <div class="ptrack"><div class="pbar a" style="--w:12.2%"></div><div class="pv" style="--w:12.2%">0,028</div></div>
+        <div class="ptrack"><div class="pbar s" style="--w:100%"></div><div class="pv" style="--w:100%;left:auto;right:14px;color:#fff">0,227</div></div></div>
+        <div class="ratio up">×8,2</div></div>
+      <div class="prow"><div class="nm">Serveur standard</div><div class="pbars">
+        <div class="ptrack"><div class="pbar a" style="--w:65.6%"></div><div class="pv" style="--w:65.6%">0,149</div></div>
+        <div class="ptrack"><div class="pbar s" style="--w:11.8%"></div><div class="pv" style="--w:11.8%">0,027</div></div></div>
+        <div class="ratio down">÷5,6</div></div>
+    </div>
+    <div class="callout" style="margin-top:26px;background:var(--orange-l);border-left-color:var(--orange)"><b>Le prix n'est pas le carbone :</b> main-d'œuvre, transport, marge du fournisseur, marché. Résultat : on agirait sur les mauvais équipements. Les auteurs déconseillent le spend-based pour les décisions à enjeu.</div>
+    <div class="source">kg CO<sub>2</sub> eq par kWh · facteur = spend-based / ACV<span class="dag">†</span> · Source : Smith, Mann &amp; Lal (2026), Table 5</div>
+  </section>
+
+  <!-- 7. Robustesse -->
+  <section class="slide" data-notes="
+    <p>Reste une question : peut-on faire confiance à ces chiffres ? Les auteurs ont fait deux tests.</p>
+    <p><b>Premier test, la sensibilité.</b> Ils ont fait varier les taux d'utilisation des serveurs vers le bas et vers le haut. La part de l'électricité varie de 62,2 % à 71,2 %, mais elle reste toujours dominante, et le classement des équipements ne change pas : le serveur standard de génération 2 reste en tête.</p>
+    <p><b>Deuxième test, une simulation de Monte Carlo</b> de 1 000 itérations. Pour le réchauffement climatique, le coefficient de variation est de <b>8,08 %</b>, très en dessous du seuil de fiabilité de 30 %. Le chiffre de 0,710 est donc stable.</p>
+    <p>Les auteurs signalent tout de même que les indicateurs de santé humaine et d'écosystèmes sont plus incertains et doivent être interprétés avec prudence.</p>">
+    <div class="tag">Peut-on se fier à ces chiffres ?</div>
+    <h1 class="title">Un résultat robuste</h1>
+    <div class="split">
+      <div class="left">
+        <div style="font-size:28px;font-weight:700;color:var(--teal-d);margin:6px 0 10px">1 · Sensibilité au taux d'utilisation des serveurs</div>
+        <table class="t">
+          <tr><th>Scénario</th><th>Utilisation G1·G2·G3</th><th>Électricité (kg/kWh)</th><th>Part du bilan</th></tr>
+          <tr><td>Bas</td><td>38 % · 48 % · 58 %</td><td>0,382</td><td>62,2 %</td></tr>
+          <tr class="ref"><td>Référence</td><td>48 % · 60 % · 72 %</td><td>0,478</td><td>67,3 %</td></tr>
+          <tr><td>Haut</td><td>58 % · 72 % · 86 %</td><td>0,573</td><td>71,2 %</td></tr>
+        </table>
+        <div class="callout" style="margin-top:26px">L'électricité reste dominante dans tous les cas, et le <b>classement des équipements ne change pas</b>.</div>
+      </div>
+      <div class="right" style="justify-content:flex-start">
+        <div style="font-size:28px;font-weight:700;color:var(--teal-d);margin:6px 0 0">2 · Simulation de Monte Carlo</div>
+        <div class="stat"><div class="big">8,08 %</div><div class="txt">coefficient de variation pour le réchauffement climatique (1 000 itérations)</div></div>
+        <div class="gauge">
+          <div class="gtrack"><div class="gmark" style="--x:calc(26.9% - 4px)"></div></div>
+          <div class="gscale"><span style="left:0;transform:none">0 %</span><span style="left:26.9%">8,08 %</span><span style="left:100%;transform:translateX(-100%)">seuil de fiabilité : 30 %</span></div>
+        </div>
+        <div class="stat" style="background:none;padding:0;font-size:26px;color:var(--muted)">Les indicateurs de santé humaine et d'écosystèmes sont plus incertains : à interpréter avec prudence.</div>
+      </div>
+    </div>
+    <div class="source">Source : Smith, Mann &amp; Lal (2026), §3.2 (Table 4) et §3.3</div>
+  </section>
+
+  <!-- 8. Au-delà du CO2 -->
+  <section class="slide" data-notes="
+    <p>Enfin, le carbone n'est pas le seul impact. L'ACV mesure aussi <b>la santé humaine, les écosystèmes et les ressources</b>. Par kWh : 2,36 × 10⁻⁶ année de vie perdue ou vécue en incapacité, soit environ 2,4 années pour un gigawattheure ; 3,37 × 10⁻⁹ espèce par an ; et 0,047 dollar de surcoût futur d'extraction des ressources.</p>
+    <p>Sur ces trois indicateurs, l'électricité reste en tête, mais le serveur standard pèse entre 19 et 31 %. Et sur la toxicité humaine, l'écotoxicité de l'eau douce et de la mer et la rareté des minéraux, il devient <b>le premier contributeur</b>, à cause du circuit intégré, responsable de 75 à 98 % de ces impacts. Il pèse aussi sur l'eau : 0,00438 m³ par kWh, dont 79 % viennent du silicium de qualité électronique.</p>
+    <p>Un bilan uniquement carbone passe donc à côté de ces impacts.</p>">
+    <div class="tag">Ce qu'un bilan carbone ne voit pas</div>
+    <h1 class="title">Au-delà du CO<sub>2</sub></h1>
+    <div class="impacts">
+      <div class="imp"><div class="k">Santé humaine</div><div class="v">2,36 × 10<sup>−6</sup></div><div class="u">DALY par kWh (années de vie perdues)</div><div class="p">Électricité <b>51 %</b><br>Serveur standard <b>31 %</b><br>≈ 2,4 années de vie perdues par GWh<span class="dag">†</span></div></div>
+      <div class="imp"><div class="k">Écosystèmes</div><div class="v">3,37 × 10<sup>−9</sup></div><div class="u">espèces·an par kWh</div><div class="p">Électricité <b>57 %</b><br>Serveur standard <b>27 %</b></div></div>
+      <div class="imp"><div class="k">Ressources</div><div class="v">0,047</div><div class="u">USD par kWh (surcoût d'extraction future)</div><div class="p">Électricité <b>70 %</b><br>Serveur standard <b>19 %</b></div></div>
+    </div>
+    <div class="hot"><b>Le serveur standard devient le n°1</b> pour la toxicité humaine, l'écotoxicité (eau douce, mer) et la rareté des minéraux : le <b>circuit intégré</b> en est responsable à 75–98 %. Il pèse aussi sur l'eau : 0,00438 m³ par kWh, dont 79 % viennent du silicium électronique.</div>
+    <div class="source"><span class="dag">†</span> calcul à partir des valeurs de l'article · Source : Smith, Mann &amp; Lal (2026), §3.1 (impacts intermédiaires et finaux)</div>
+  </section>
+
+  <!-- 9. À retenir -->
+  <section class="slide" data-notes="
+    <p>En résumé : <b>0,710 kilogramme par kWh</b>, deux tiers dus à l'électricité, un cinquième dû aux serveurs standard. <b>L'average-data est acceptable, le spend-based ne l'est pas.</b> Et le CO₂ ne dit pas tout.</p>
+    <p>La question suivante est donc : comment réduire ce bilan ? C'est ce que va vous présenter Lilian, avec les deux scénarios testés par les auteurs : les panneaux solaires en toiture et un réseau électrique bas-carbone.</p>">
+    <div class="tag">Synthèse</div>
+    <h1 class="title">Ce qu'il faut retenir</h1>
+    <div class="points">
+      <div class="pt"><div class="n">1</div><div><b>0,710 kg CO<sub>2</sub> eq/kWh</b> : un bilan fiable (CV de 8,08 %) et stable face aux variations d'usage</div></div>
+      <div class="pt"><div class="n">2</div><div><b>67,3 % d'électricité</b>, 32,7 % de fabrication : un tiers du carbone est déjà dans le matériel</div></div>
+      <div class="pt"><div class="n">3</div><div><b>Les serveurs standard : 20,9 % du bilan</b> (≈ 30 % pour la génération 2), la cible prioritaire</div></div>
+      <div class="pt"><div class="n">4</div><div><b>Average-data acceptable (+1,8 %), spend-based non (+40,4 %)</b> : total gonflé et mauvais équipements ciblés</div></div>
+      <div class="pt"><div class="n">5</div><div><b>Le CO<sub>2</sub> ne dit pas tout</b> : santé, écosystèmes, eau, toxicité et ressources échappent à un bilan carbone seul</div></div>
+    </div>
+    <div class="next"><b>Comment réduire ce bilan ?</b> Lilian présente les deux scénarios testés : panneaux solaires en toiture et réseau électrique bas-carbone.</div>
+  </section>
+
+</div>
+
+<div id="nav"><button class="prev" aria-label="Précédent">‹</button><button class="next-b" aria-label="Suivant">›</button></div>
+<div id="notes"><div class="hd"><span id="nt">Notes du présentateur</span><span id="timer">0:00</span></div><div id="nb"></div></div>
+<div id="hint">← → naviguer · F plein écran · N notes · Début / Fin</div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var progress = document.getElementById('progress');
+  var notes = document.getElementById('notes');
+  var nb = document.getElementById('nb');
+  var nt = document.getElementById('nt');
+  var timerEl = document.getElementById('timer');
+  var idx = 0, t0 = null;
+
+  // numéros de page
+  slides.forEach(function (s, k) {
+    if (k === 0) return;
+    var p = s.querySelector('.pageno');
+    if (!p) { p = document.createElement('div'); p.className = 'pageno'; s.appendChild(p); }
+    p.textContent = (k + 1) + ' / ' + slides.length;
+  });
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+
+  function show(n, fromHash) {
+    idx = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === idx); });
+    progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+    nb.innerHTML = slides[idx].getAttribute('data-notes') || '<p>(pas de notes)</p>';
+    nt.textContent = 'Notes du présentateur · diapo ' + (idx + 1) + ' / ' + slides.length;
+    if (!fromHash) { try { history.replaceState(null, '', '#' + (idx + 1)); } catch (e) {} }
+    if (idx > 0 && t0 === null) t0 = Date.now();
+  }
+
+  function next() { show(idx + 1); }
+  function prev() { show(idx - 1); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'PageDown': case ' ': case 'Enter': e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'PageUp': case 'Backspace': e.preventDefault(); prev(); break;
+      case 'Home': show(0); break;
+      case 'End': show(slides.length - 1); break;
+      case 'n': case 'N': notes.classList.toggle('on'); break;
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+        else document.exitFullscreen && document.exitFullscreen();
+        break;
+      case 'r': case 'R': t0 = null; timerEl.textContent = '0:00'; break;
+    }
+  });
+  document.querySelector('#nav .prev').addEventListener('click', prev);
+  document.querySelector('#nav .next-b').addEventListener('click', next);
+
+  var sx = null;
+  document.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    sx = null;
+  });
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function () { var n = parseInt(location.hash.slice(1), 10); if (n) show(n - 1, true); });
+
+  setInterval(function () {
+    if (t0 === null) return;
+    var s = Math.floor((Date.now() - t0) / 1000);
+    timerEl.textContent = Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+  }, 500);
+
+  fit();
+  var start = parseInt(location.hash.slice(1), 10);
+  show(start ? start - 1 : 0, true);
+  setTimeout(function () { var h = document.getElementById('hint'); if (h) h.style.opacity = 0.35; }, 6000);
+})();
+</script>
+</body>
+</html>
